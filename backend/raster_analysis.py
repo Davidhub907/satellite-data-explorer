@@ -2,10 +2,10 @@ import rasterio
 
 def calculate_statistics(band) -> dict:
 
-    band_min = band.min()
-    band_max = band.max()
-    band_mean = band.mean()
-    band_std = band.std()
+    band_min = int(band.min())
+    band_max = int(band.max())
+    band_mean = float(band.mean())
+    band_std = float(band.std())
 
 
     results = {
@@ -22,7 +22,10 @@ def calculate_statistics(band) -> dict:
 with rasterio.open("data/RGB.byte.tif") as src: 
 
     band = src.read(1)
+    nodata = src.nodata
+    print(nodata)
 
-    stats = calculate_statistics(band)
+    valid_pixels = band[band != nodata]
 
+    stats = calculate_statistics(valid_pixels)
     print(stats)
