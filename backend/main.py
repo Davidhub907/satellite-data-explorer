@@ -28,3 +28,41 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# PyDantic response models
+
+class HealthResponse(BaseModel):
+    status: str
+
+
+class DatasetListResponse(BaseModel):
+    total: int
+    datasets: list[str]
+
+
+class Resolution(BaseModel):
+    x: float
+    y: float
+
+
+class RasterMetadata(BaseModel):
+    width: int
+    height: int
+    bands: int
+    nodata: float | None
+    crs: str | None
+    resolution: Resolution
+    transform: list[float]
+
+
+class BandStatistics(BaseModel):
+    band: int | None = None
+    min: int
+    max: int
+    mean: float
+    std: float
+
+
+class RasterAnalysis(BaseModel):
+    metadata: RasterMetadata
+    statistics: list[BandStatistics]
