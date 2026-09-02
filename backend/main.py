@@ -66,3 +66,43 @@ class BandStatistics(BaseModel):
 class RasterAnalysis(BaseModel):
     metadata: RasterMetadata
     statistics: list[BandStatistics]
+
+
+# Internal helper functions
+
+def get_dataset_path(dataset: str) -> FilePath:
+    dataset_path = (DATA_DIR / dataset).resolve()
+    data_directory = DATA_DIR.resolve()
+
+    if dataset_path.parent != data_directory:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid dataset path",
+        )
+
+    if dataset_path.suffix.lower() not in {".tif", ".tiff"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Dataset must be a GeoTIFF file",
+        )
+
+    if not dataset_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"Dataset '{dataset}' was not found",
+        )
+
+    return dataset_path
+
+
+def run_analysis(dataset: str) -> dict:
+    dataset_path = get_dataset_path(dataset)
+
+    try:
+        return analyze_raster(str(dataset_path))
+
+    except RasterioIOError:
+        raise HTTPException(
+            status_code=422,
+            detail="The dataset could not be opened as a valid raster",
+        )
