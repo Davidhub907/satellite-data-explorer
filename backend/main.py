@@ -44,6 +44,11 @@ class Resolution(BaseModel):
     x: float
     y: float
 
+class Bounds(BaseModel):
+    left: float
+    bottom: float
+    right: float
+    top: float
 
 class RasterMetadata(BaseModel):
     width: int
@@ -52,6 +57,7 @@ class RasterMetadata(BaseModel):
     nodata: float | None
     crs: str | None
     resolution: Resolution
+    bounds: Bounds
     transform: list[float]
 
 
