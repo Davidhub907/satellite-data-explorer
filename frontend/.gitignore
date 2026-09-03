@@ -1,5 +1,11 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
 # Compiled output
 /dist
 /tmp
