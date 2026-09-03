@@ -1,4 +1,189 @@
-<h1>{{ title }}</h1>
+<div class="app">
+  <header class="header">
+    <div>
+      <p class="eyebrow">GEOSPATIAL ANALYSIS</p>
 
-<p>Dataset</p>
-<filen
+      <h1>
+        {{ title }}
+      </h1>
+
+      <p class="subtitle">Explore raster metadata and statistical information.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="control-panel">
+      <div class="field">
+        <label for="dataset"> Dataset </label>
+
+        @if (loadingDatasets) {
+          <p class="status">Loading datasets...</p>
+        } @else {
+          <select
+            id="dataset"
+            #datasetSelect
+            [value]="selectedDataset"
+            [disabled]="analyzing"
+            (change)="selectDataset(datasetSelect.value)"
+          >
+            @for (dataset of datasets; track dataset) {
+              <option [value]="dataset">
+                {{ dataset }}
+              </option>
+            }
+          </select>
+        }
+      </div>
+
+      <button
+        class="analyze-button"
+        [disabled]="!selectedDataset || analyzing || loadingDatasets"
+        (click)="analyzeDataset()"
+      >
+        @if (analyzing) {
+          Analyzing...
+        } @else {
+          Analyze Dataset
+        }
+      </button>
+    </section>
+
+    @if (error) {
+      <section class="error">
+        {{ error }}
+      </section>
+    }
+
+    @if (metadata) {
+      <section class="results">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">DATASET</p>
+
+            <h2>
+              {{ metadata.filename }}
+            </h2>
+          </div>
+        </div>
+
+        <div class="metadata-grid">
+          <div class="card">
+            <span class="label"> Dimensions </span>
+
+            <strong>
+              {{ metadata.width }}
+              ×
+              {{ metadata.height }}
+            </strong>
+          </div>
+
+          <div class="card">
+            <span class="label"> Bands </span>
+
+            <strong>
+              {{ metadata.bands }}
+            </strong>
+          </div>
+
+          <div class="card">
+            <span class="label"> CRS </span>
+
+            <strong>
+              {{ metadata.crs }}
+            </strong>
+          </div>
+
+          <div class="card">
+            <span class="label"> Resolution </span>
+
+            <strong>
+              {{ metadata.resolution[0] }}
+              ×
+              {{ metadata.resolution[1] }}
+            </strong>
+          </div>
+        </div>
+
+        <section class="bounds-section">
+          <h3>Bounds</h3>
+
+          <div class="bounds-grid">
+            <div>
+              <span>Left</span>
+              <strong>
+                {{ metadata.bounds.left }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Bottom</span>
+              <strong>
+                {{ metadata.bounds.bottom }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Right</span>
+              <strong>
+                {{ metadata.bounds.right }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Top</span>
+              <strong>
+                {{ metadata.bounds.top }}
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="statistics-section">
+          <h3>Band Statistics</h3>
+
+          @if (statistics.length === 0) {
+            <p class="status">No statistical data available.</p>
+          } @else {
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Band</th>
+                    <th>Minimum</th>
+                    <th>Maximum</th>
+                    <th>Mean</th>
+                    <th>Std Dev</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (stat of statistics; track stat.band) {
+                    <tr>
+                      <td>Band {{ stat.band }}</td>
+
+                      <td>
+                        {{ stat.min }}
+                      </td>
+
+                      <td>
+                        {{ stat.max }}
+                      </td>
+
+                      <td>
+                        {{ stat.mean }}
+                      </td>
+
+                      <td>
+                        {{ stat.stdDev }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      </section>
+    }
+  </main>
+</div>
