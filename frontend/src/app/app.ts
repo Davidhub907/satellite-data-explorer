@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
 
@@ -18,88 +18,90 @@ export class App implements OnInit {
 
   title = 'Satellite Data Explorer';
 
-  datasets: string[] = [];
+  datasets = signal<string[]>([]);
 
-  selectedDataset = '';
+  selectedDataset = signal('');
 
-  metadata: DatasetMetadata | null = null;
+  metadata = signal<DatasetMetadata | null>(null);
 
-  statistics: BandStatistics[] = [];
+  statistics = signal<BandStatistics[]>([]);
 
-  loadingDatasets = true;
+  loadingDatasets = signal(true);
 
-  analyzing = false;
+  analyzing = signal(false);
 
-  error = '';
+  error = signal('');
 
   ngOnInit(): void {
     this.loadDatasets();
   }
 
   loadDatasets(): void {
-    this.loadingDatasets = true;
-    this.error = '';
+    this.loadingDatasets.set(true);
+    this.error.set('');
 
     this.datasetService.getDatasets().subscribe({
       next: (datasets) => {
-        this.datasets = datasets;
+        console.log('Datasets received:', datasets);
+
+        this.datasets.set(datasets);
 
         if (datasets.length > 0) {
-          this.selectedDataset = datasets[0];
+          this.selectedDataset.set(datasets[0]);
         }
 
-        this.loadingDatasets = false;
+        this.loadingDatasets.set(false);
       },
 
       error: (error) => {
-        console.error(error);
+        console.error('Dataset loading error:', error);
 
-        this.error = 'Could not load datasets from the backend.';
+        this.error.set('Could not load datasets from the backend.');
 
-        this.loadingDatasets = false;
+        this.loadingDatasets.set(false);
       },
     });
   }
 
   selectDataset(dataset: string): void {
-    this.selectedDataset = dataset;
+    this.selectedDataset.set(dataset);
 
-    this.metadata = null;
-    this.statistics = [];
-    this.error = '';
+    this.metadata.set(null);
+    this.statistics.set([]);
+    this.error.set('');
   }
 
   analyzeDataset(): void {
-    if (!this.selectedDataset) {
+    const dataset = this.selectedDataset();
+
+    if (!dataset) {
       return;
     }
 
-    this.analyzing = true;
+    this.analyzing.set(true);
+    this.error.set('');
 
-    this.error = '';
-
-    this.metadata = null;
-    this.statistics = [];
+    this.metadata.set(null);
+    this.statistics.set([]);
 
     forkJoin({
-      metadata: this.datasetService.getMetadata(this.selectedDataset),
+      metadata: this.datasetService.getMetadata(dataset),
 
-      statistics: this.datasetService.getStatistics(this.selectedDataset),
+      statistics: this.datasetService.getStatistics(dataset),
     }).subscribe({
       next: (result) => {
-        this.metadata = result.metadata;
+        this.metadata.set(result.metadata);
+        this.statistics.set(result.statistics);
 
-        this.statistics = result.statistics;
-
-        this.analyzing = false;
+        this.analyzing.set(false);
       },
 
       error: (error) => {
-        console.error(error);
+        console.error('Analysis error:', error);
 
-        this.error = 'An error occurred while analyzing the dataset.';
+        this.error.set('An error occurred while analyzing the dataset.');
 
-        this.analyzing = false;
+        this.analyzing.set(false);
       },
     });
   }

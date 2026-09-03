@@ -16,17 +16,17 @@
       <div class="field">
         <label for="dataset"> Dataset </label>
 
-        @if (loadingDatasets) {
+        @if (loadingDatasets()) {
           <p class="status">Loading datasets...</p>
         } @else {
           <select
             id="dataset"
             #datasetSelect
-            [value]="selectedDataset"
-            [disabled]="analyzing"
+            [value]="selectedDataset()"
+            [disabled]="analyzing()"
             (change)="selectDataset(datasetSelect.value)"
           >
-            @for (dataset of datasets; track dataset) {
+            @for (dataset of datasets(); track dataset) {
               <option [value]="dataset">
                 {{ dataset }}
               </option>
@@ -37,10 +37,10 @@
 
       <button
         class="analyze-button"
-        [disabled]="!selectedDataset || analyzing || loadingDatasets"
+        [disabled]="!selectedDataset() || analyzing() || loadingDatasets()"
         (click)="analyzeDataset()"
       >
-        @if (analyzing) {
+        @if (analyzing()) {
           Analyzing...
         } @else {
           Analyze Dataset
@@ -48,20 +48,20 @@
       </button>
     </section>
 
-    @if (error) {
+    @if (error()) {
       <section class="error">
-        {{ error }}
+        {{ error() }}
       </section>
     }
 
-    @if (metadata) {
+    @if (metadata(); as data) {
       <section class="results">
         <div class="section-heading">
           <div>
             <p class="eyebrow">DATASET</p>
 
             <h2>
-              {{ metadata.filename }}
+              {{ data.filename }}
             </h2>
           </div>
         </div>
@@ -71,9 +71,9 @@
             <span class="label"> Dimensions </span>
 
             <strong>
-              {{ metadata.width }}
+              {{ data.width }}
               ×
-              {{ metadata.height }}
+              {{ data.height }}
             </strong>
           </div>
 
@@ -81,7 +81,7 @@
             <span class="label"> Bands </span>
 
             <strong>
-              {{ metadata.bands }}
+              {{ data.bands }}
             </strong>
           </div>
 
@@ -89,7 +89,7 @@
             <span class="label"> CRS </span>
 
             <strong>
-              {{ metadata.crs }}
+              {{ data.crs }}
             </strong>
           </div>
 
@@ -97,9 +97,9 @@
             <span class="label"> Resolution </span>
 
             <strong>
-              {{ metadata.resolution[0] }}
+              {{ data.resolution[0] }}
               ×
-              {{ metadata.resolution[1] }}
+              {{ data.resolution[1] }}
             </strong>
           </div>
         </div>
@@ -110,29 +110,33 @@
           <div class="bounds-grid">
             <div>
               <span>Left</span>
+
               <strong>
-                {{ metadata.bounds.left }}
+                {{ data.bounds.left }}
               </strong>
             </div>
 
             <div>
               <span>Bottom</span>
+
               <strong>
-                {{ metadata.bounds.bottom }}
+                {{ data.bounds.bottom }}
               </strong>
             </div>
 
             <div>
               <span>Right</span>
+
               <strong>
-                {{ metadata.bounds.right }}
+                {{ data.bounds.right }}
               </strong>
             </div>
 
             <div>
               <span>Top</span>
+
               <strong>
-                {{ metadata.bounds.top }}
+                {{ data.bounds.top }}
               </strong>
             </div>
           </div>
@@ -141,7 +145,7 @@
         <section class="statistics-section">
           <h3>Band Statistics</h3>
 
-          @if (statistics.length === 0) {
+          @if (statistics().length === 0) {
             <p class="status">No statistical data available.</p>
           } @else {
             <div class="table-wrapper">
@@ -157,7 +161,7 @@
                 </thead>
 
                 <tbody>
-                  @for (stat of statistics; track stat.band) {
+                  @for (stat of statistics(); track stat.band) {
                     <tr>
                       <td>Band {{ stat.band }}</td>
 
