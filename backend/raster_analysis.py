@@ -13,7 +13,7 @@ def calculate_statistics(band) -> dict:
 
 
 def calculate_metadata(src) -> dict:
-    """Extract useful metadata from an opened Rasterio dataset."""
+    """Extract useful metadata from an opened Rasterio src."""
 
     return {
         "width": src.width,
@@ -25,6 +25,14 @@ def calculate_metadata(src) -> dict:
             "x": float(src.res[0]),
             "y": float(src.res[1]),
         },
+
+        "bounds": {
+        "left": src.bounds.left,
+        "bottom": src.bounds.bottom,
+        "right": src.bounds.right,
+        "top": src.bounds.top,
+    },
+
         "transform": list(src.transform),
     }
 
