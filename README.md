@@ -6,6 +6,8 @@ The application discovers raster datasets, analyzes their metadata and pixel sta
 
 I created this project to help me learn and get a basic understanding the languages and the frameworks used in the project. This was not built from scratch, I used ChatGPT and Claude AI to assist in the development. I focused on learning by having AI build out parts of it, then it explained how it worked and why it was important, then I added onto it what I could.
 
+TLDR: Full-stack project built with python, angular, and typescript. Built for learning, not for quality.
+
 ## Features
 
 - Discover available raster datasets
